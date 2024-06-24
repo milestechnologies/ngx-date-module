@@ -1,7 +1,11 @@
 import {} from 'jasmine';
 import { RelativityDate } from '../relativity-date/relativity-date.library';
-import { isMoment } from 'moment';
+import { isMoment, relativeTimeRounding } from 'moment';
 import { DateParts } from '../relativity-date/date-parts.library';
+import { IDateModuleConfiguration } from '../config/relativity-date-config.library';
+import { HolidayDefinitions } from '../holiday/default-holidays.library';
+import { async, TestBed } from '@angular/core/testing';
+import { NgxRelativityDateModule } from '../public_api';
 
 function getFebruraryFirst2018StartingDate(): Date {
     return new Date(2018, 1, 1);
@@ -33,6 +37,38 @@ describe('date.libary', () => {
     const nineMillisecondsLess = new Date(2018, 9, 24, 23, 59, 59, 991);
     let relativityDate: RelativityDate;
     // =================================
+
+    describe('constructor', () => {
+        it('takes a custom configuration file', () => {
+            const theDate = new Date(2020, 2, 12);
+            const config: IDateModuleConfiguration = {
+                defaultFormatString: 'dddd, MMMM, Do, YYYY, h:mm:ss a',
+                holidays: [
+                    HolidayDefinitions.christmas,
+                ]
+            };
+
+            relativityDate = new RelativityDate(theDate, false, config);
+
+            expect(relativityDate.config).toBe(config);
+        });
+    });
+
+    describe('get config', () => {
+        it('returns the current config', () => {
+            const theDate = new Date(2020, 2, 12);
+            const config: IDateModuleConfiguration = {
+                defaultFormatString: 'dddd, MMMM, Do, YYYY, h:mm:ss a',
+                holidays: [
+                    HolidayDefinitions.christmas,
+                ]
+            };
+
+            relativityDate = new RelativityDate(theDate, false, config);
+            
+            expect(relativityDate.getConfig()).toBe(config);
+        });
+    });
 
     describe('add time', () => {
         describe('without asReference', () => {
@@ -391,6 +427,29 @@ describe('date.libary', () => {
 
         it('should get new date', () => {
             expect(relativityDate.date).not.toBeNull();
+        });
+    });
+
+    describe('date comparison', () => {
+        beforeEach(async(() => {
+            TestBed.configureTestingModule({
+                declarations: [],
+                imports: [NgxRelativityDateModule.forRoot()]
+            });
+        }));
+
+        it(('correctly detects if this date is before another one'), () => {
+            const theDate = new RelativityDate(new Date(2019, 1, 22));
+            const dateBefore = new Date(2019, 2, 12);
+        
+            expect(theDate.isBeforeDate(dateBefore)).toBe(true);
+        });
+
+        it(('correctly detects if this date is after another one'), () => {
+            const theDate = new Date(2019, 2, 12);
+            const dateAfter = new RelativityDate(new Date(2019, 5, 18));
+
+            expect(dateAfter.isAfterDate(theDate));
         });
     });
 });
