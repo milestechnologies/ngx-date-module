@@ -26,10 +26,12 @@ export class RelativityDate implements IRelativityDate {
     config: IDateModuleConfiguration;
 
     /**
-     * Create an RelativityDate object
-     * @param dateParam the date object to use for the initial value.  Defaults to now.
-     * @param asReference boolean flag indicating whether the dateParam should be handled
-     * as a reference object.  Defaults to false.
+     * Create a RelativityDate object
+     * @param dateParam Optional. The date object to use for the initial value. Defaults to now.
+     * @param asReference Boolean flag indicating whether the dateParam should be handled
+     * as a reference to the original. Defaults to false.
+     * @param customConfig Optional. Contains an IDateModuleConfiguration object. If not
+     * provided, the default config is used.
      */
     constructor(
         dateParam?: Date,
@@ -61,9 +63,10 @@ export class RelativityDate implements IRelativityDate {
     }
 
     /**
-     * Add to the relativityDate value using a specified datePart.
+     * Add to the RelativityDate value using a specified datePart.
      * @param amount integer amount to add.
      * @param part date part enumerator specifying which part of the date to add to.
+     * @returns {RelativityDate} the modified RelativityDate object so that operators can be chained.
      */
     add(amount: number, part: DateParts): RelativityDate {
         const date = moment(this.date)
@@ -77,6 +80,7 @@ export class RelativityDate implements IRelativityDate {
      * Subtract from the relativityDate value using a specified datePart.
      * @param amount integer amount to subtract.
      * @param part date part enumerator specifying which part of the date to subtract from.
+     * @returns {RelativityDate} the modified RelativityDate object so that operators can be chained.
      */
     subtract(amount: number, part: DateParts): RelativityDate {
         const date = moment(this.date)
@@ -122,10 +126,11 @@ export class RelativityDate implements IRelativityDate {
     }
 
     /**
-     * Get a string reprensentation of the relativityDate.
-     * @param tokenString string including tokens that will be replaced with date parts.
+     * Get a string reprensentation of the RelativityDate using MomentJS.
+     * @param tokenString string of tokens representing the date parts in the format you want.
      * Defaults to 'YYYY-MM-DDTHH:mm:ssZ'.
-     * documented here https://momentjs.com/docs/#/displaying/format/
+     * Additional documentation can be found here: https://momentjs.com/docs/#/displaying/format/
+     * @returns formatted string representation of the RelativityDate.
      */
     format(tokenString?: string): string {
         if (!tokenString) {
@@ -135,8 +140,11 @@ export class RelativityDate implements IRelativityDate {
     }
 
     /**
-     * Get a string representing the time from the date param to the relativityDate.
-     * @param date the date to start from when comparing the relativityDate.  Defaults to now.
+     * Get a string representing the amount of time between date param and the relativityDate
+     * using MomentJS.
+     * Additional documentation can be found here: https://momentjs.com/docs/#/displaying/from/
+     * @param date the date to start from when comparing the relativityDate. Defaults to now.
+     * @returns string representation of the date
      */
     from(date?: Date): string {
         if (!date) {
@@ -146,8 +154,11 @@ export class RelativityDate implements IRelativityDate {
     }
 
     /**
-     * Get a string representing the time from the relativityDate to the date param.
-     * @param date the date to end at when comparing the relativityDate.  Defaults to now.
+     * Get a string representing the amount of time between the relativityDate and the date param
+     * using MomentJS.
+     * Additional documentation can be found here: https://momentjs.com/docs/#/displaying/to/
+     * @param date the date to end at when comparing the relativityDate. Defaults to now.
+     * @returns a string representation of the date
      */
     to(date?: Date): string {
         if (!date) {
@@ -157,8 +168,8 @@ export class RelativityDate implements IRelativityDate {
     }
 
     /**
-     * Provide the relativityDate as a Moment object with all of the moment
-     * library functions accessible.  Will have no reference back to the relativityDate object.
+     * Provide the RelativityDate as a Moment object.
+     * There will NOT be a reference back to the RelativityDate object.
      * Moment documentation here http://momentjs.com/docs/
      */
     toMoment(): momentImported.Moment {
@@ -166,24 +177,26 @@ export class RelativityDate implements IRelativityDate {
     }
 
     /**
-     * @description Checks against date object to see which date came first
-     * @param date holds a date object
-     * @returns whether the date was before
+     * Checks if this RelativityDate comes before the date provided using MomentJS.
+     * Moment documentation here https://momentjs.com/docs/#/displaying/difference/
+     * @param date the date to compare with
+     * @returns true if the date was before
      */
     isBeforeDate(date: Date): boolean {
         return this.toMoment().diff(date.relativityDate.toMoment()) < 0;
     }
     /**
-     * @description Checks against date object to see which date came first
-     * @param date holds a date object
-     * @returns whether the date was after
+     * Checks if this RelativityDate comes after the provided date using MomentJS.
+     * Moment documentation here https://momentjs.com/docs/#/displaying/difference/
+     * @param date the date to compare with
+     * @returns true if the date was after
      */
     isAfterDate(date: Date): boolean {
         return this.toMoment().diff(date.relativityDate.toMoment()) > 0;
     }
 
     /**
-     * @description referencing function in holiday library
+     * Referencing function in holiday library
      * @returns Description of Holiday if date matches a holiday or false if date does not match holiday
      */
     isHoliday(): string | boolean {
@@ -191,7 +204,7 @@ export class RelativityDate implements IRelativityDate {
     }
 
     /**
-     * @description referencing function in holiday library
+     * Referencing function in holiday library
      * @returns returns the string from calling .to(next occurence of holiday)
      */
     howLongUntilNextHoliday(): string {
@@ -199,7 +212,7 @@ export class RelativityDate implements IRelativityDate {
     }
 
     /**
-     * @description referencing function in holiday library
+     * Referencing function in holiday library
      * @param month month value passed in
      * @param day day value passed in
      * @returns next instance of the day/month combo
